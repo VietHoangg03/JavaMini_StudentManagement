@@ -1,0 +1,47 @@
+A. Phần chương trình
+	Xây dựng lớp đối tượng tỉnh thành:
+	 - Mã tỉnh: int
+	 - Tên tỉnh: String
+	 
+	Xây dựng lớp đối tượng thí sinh:
+	 - Mã thí sinh: int
+	 - Tên thí sinh: String
+	 - Mã quê quán <tham chiếu đến đối tượng tỉnh thành>
+	 - Ngày tháng năm sinh: Date
+	 - Giới tính : Boolean <Nam = true, Nữ = false>
+	 - Điểm môn 1: float <0.0 - 10.0>
+	 - Điểm môn 2: float <0.0 - 10.0>
+	 - Điểm môn 3: float <0.0 - 10.0>
+	 
+	 Xây dựng các danh sách cho phép quản lý:
+	 - Danh sách các tỉnh thành
+	 - Danh sách các thí sinh tham gia thi đại học
+	 
+	 Phần mềm cung cấp một giao diện thân thiện cho phép người
+	 dùng thực hiện các chức năng sau đây:
+	  - Kết nối file dữ liệu
+	  - Kết thúc kết nối và lưu dữ liệu vào file dữ liệu
+	  - Hiển thị thông tin và quản lý thí sinh thi đại học
+	  	+ Chức năng lọc thông tin <Filtre>: cho phép lọc
+	  	danh sách các thí sinh theo quê quán hoặc theo giới tính.
+	  	+ Danh sách thí sinh: hiển thị đầy đủ các thông tin các
+	  	thí sinh < Đã lọc hoặc chưa lọc thông tin>.
+	  	+ Thông tin chi tiết: Khi người dùng chọn 1 thí sinh, 
+	  	thông tin đầy đủ sẽ hiển thị ở bảng chi tiết cho phép người dùng:
+	  		* Thêm mới, loại bỏ, thay đổi thông tin <OK - CANCEL>
+	  	+ Kết thúc chương trình
+	  	+ Giới thiệu chương trình
+  	
+  B. Quản lý dữ liệu
+	  Thông tin của thí sinh và quê quán có thể được lưu trữ theo nhiều cách
+	  khác nhau, trong hệ thống này, yêu cầu lưu dữ liệu thông qua các file
+	  "thisinhtxt" và "tinhthanh.txt" với cấu chức như sau:
+	  	1. "tinhthanh.txt": mỗi dòng chứa thông tin
+	  	Mã tỉnh; tên tỉnh
+	  	Ví dụ: 1; Ha Noi
+	  		 2; Hai Phong
+	  	2. "thisinh.txt": mỗi dòng chứa thông tin
+	  	Mã, tên, mã tỉnh, ngày sinh, giới tính, toán, lý, hoá
+	  	Ví dụ:
+	  	10001; Nguyen Khanh Linh, 1, 02/09/2003, false, 7, 8, 9
+	 
