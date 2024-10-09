@@ -314,6 +314,17 @@ public class QLSVView extends JFrame {
 		comboBox_queQuan.setSelectedIndex(-1);
 		buttonGroup_GioiTinh.clearSelection();
 	}
+	
+	public void themThiSinhVaoTaBle(ThiSinh ts) {
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		String formatNgaySinh = simpleDateFormat.format(ts.getNgaySinh());
+		DefaultTableModel model_table = (DefaultTableModel) table.getModel();
+		model_table.addRow(new Object[] {
+				ts.getMaThiSinh()+"", ts.getTenThiSinh(), ts.getQueQuan().getTenTinh(),
+				formatNgaySinh, (ts.isGioiTinh()?"Nam":"Nữ"),
+				ts.getDiemMon1()+"", ts.getDiemMon2()+"", ts.getDiemMon3()+""
+		});
+	}
 
 	public void themHoacCapNhatSinhVien(ThiSinh ts) {
 		
@@ -323,11 +334,7 @@ public class QLSVView extends JFrame {
 		
 		if(!this.model.kiemTraTonTai(ts)) {
 			this.model.insert(ts);
-			model_table.addRow(new Object[] {
-					ts.getMaThiSinh()+"", ts.getTenThiSinh(), ts.getQueQuan().getTenTinh(),
-					formatNgaySinh, (ts.isGioiTinh()?"Nam":"Nữ"),
-					ts.getDiemMon1()+"", ts.getDiemMon2()+"", ts.getDiemMon3()+""
-			});
+			this.themThiSinhVaoTaBle(ts);
 		} else {
 			this.model.update(ts);
 			int soLuongDong = model_table.getRowCount();
@@ -423,6 +430,10 @@ public class QLSVView extends JFrame {
 	}
 
 	public void thucHienTimKiem() {
+		//Gọi hàm huỷ tìm kiếm
+		this.thucHienHuyTim();
+		
+		// Thực hiện tìm kiếm
 		int queQuan = this.comboBox_queQuan_timKiem.getSelectedIndex()-1;
 		String maThiSinhTimKiem = this.textField_MaThiSinh_TimKiem.getText();
 		DefaultTableModel model_table = (DefaultTableModel) table.getModel();
@@ -466,9 +477,21 @@ public class QLSVView extends JFrame {
 		}
 		
 	}
+	
 
+	
 	public void thucHienHuyTim() {
-		// TODO Auto-generated method stub
-		
+		while(true) {
+			DefaultTableModel model_table = (DefaultTableModel) table.getModel();
+			int soLuongDong = model_table.getRowCount();
+			if (soLuongDong == 0)
+				break;
+			else {
+				model_table.removeRow(0);
+			}
+		};
+		for(ThiSinh ts :this.model.getDsThiSinh()) {
+			this.themThiSinhVaoTaBle(ts);
+		}
 	}
 }
