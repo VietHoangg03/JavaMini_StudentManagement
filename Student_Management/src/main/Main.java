@@ -1,20 +1,21 @@
 package main;
 
 import java.awt.EventQueue;
+import java.awt.Window;
+
+import javax.swing.UIManager;
 
 import view.QLSVView;
 
 public class Main {
 		public static void main(String[] args) {
-			EventQueue.invokeLater(new Runnable() {
-				public void run() {
 					try {
+						UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 						QLSVView frame = new QLSVView();
 						frame.setVisible(true);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-				}
-			});
-		}
+			}
 }
+
