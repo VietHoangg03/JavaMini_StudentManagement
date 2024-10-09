@@ -487,7 +487,11 @@ public class QLSVView extends JFrame {
 			if (soLuongDong == 0)
 				break;
 			else {
-				model_table.removeRow(0);
+				try {
+					model_table.removeRow(0);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		};
 		for(ThiSinh ts :this.model.getDsThiSinh()) {
