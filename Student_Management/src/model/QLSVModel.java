@@ -6,10 +6,20 @@ import java.util.ArrayList;
 public class QLSVModel {
 	private ArrayList<ThiSinh> dsThiSinh;
 	private String luaChon;
+	private String tenFile;
 
 	public QLSVModel() {
 		this.dsThiSinh = new ArrayList<ThiSinh>();
 		this.luaChon = "";
+		this.tenFile = "";
+	}
+
+	public String getTenFile() {
+		return tenFile;
+	}
+
+	public void setTenFile(String tenFile) {
+		this.tenFile = tenFile;
 	}
 
 	public QLSVModel(ArrayList<ThiSinh> dsThiSinh) {

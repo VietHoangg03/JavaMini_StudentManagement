@@ -1,10 +1,11 @@
 package model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Objects;
 
-public class Tinh {
+public class Tinh implements Serializable {
 	private int maTinh;
 	private String tenTinh;
 	

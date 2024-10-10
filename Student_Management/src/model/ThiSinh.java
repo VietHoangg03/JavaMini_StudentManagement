@@ -1,9 +1,10 @@
 package model;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 
-public class ThiSinh {
+public class ThiSinh implements Serializable {
 	private int maThiSinh;
 	private String tenThiSinh;
 	private Tinh queQuan;

@@ -2,6 +2,7 @@ package controller;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
@@ -48,7 +49,15 @@ public class QLSVController implements ActionListener {
 		} else if (acctionCommand.equals("Tìm")) {
 			this.view.thucHienTimKiem();
 		} else if (acctionCommand.equals("Huỷ tìm")) {
-			this.view.thucHienHuyTim();
+			this.view.thucHienTaiLaiDuLieu();
+		} else if (acctionCommand.equals("About me")) {
+			this.view.hienThiAbout();
+		} else if (acctionCommand.equals("Exit")) {
+			this.view.thoatChuongTrinh();
+		} else if (acctionCommand.equals("Save")) {
+			this.view.thucHienSaveFile();
+		} else if (acctionCommand.equals("Open")) {
+			this.view.thucHienOpenFile();
 		}
 	}
 }

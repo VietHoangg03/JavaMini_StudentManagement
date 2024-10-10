@@ -29,10 +29,18 @@ import java.awt.Font;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JTable;
 import javax.swing.JScrollPane;
 import javax.swing.JRadioButton;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
@@ -84,21 +92,26 @@ public class QLSVView extends JFrame {
 		menuBar.add(menuFile);
 		
 		JMenuItem menuOpen = new JMenuItem("Open");
+		menuOpen.addActionListener(actionListener);
 		menuFile.add(menuOpen);
 		
-		JMenuItem menuClose = new JMenuItem("Close");
-		menuFile.add(menuClose);
+		JMenuItem menuSave = new JMenuItem("Save");
+		menuSave.addActionListener(actionListener);
+		menuFile.add(menuSave);
 		
 		JSeparator separator = new JSeparator();
 		menuFile.add(separator);
 		
 		JMenuItem menuExit = new JMenuItem("Exit");
+		menuExit.addActionListener(actionListener);
 		menuFile.add(menuExit);
 		
 		JMenu menuAbout = new JMenu("About");
+		menuAbout.addActionListener(actionListener);
 		menuBar.add(menuAbout);
 		
 		JMenuItem menuItemAbout = new JMenuItem("About me");
+		menuItemAbout.addActionListener(actionListener);
 		menuAbout.add(menuItemAbout);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -156,6 +169,7 @@ public class QLSVView extends JFrame {
 				},new String[] {
 						"Mã thí sinh", "Họ tên", "Quê quán","Ngày Sinh", "Giới tính", "Điểm 1","Điểm 2","Điểm 3"
 				}));
+		table.setRowHeight(25);
 		
 		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane.setBounds(35, 95, 716, 205);
@@ -467,7 +481,7 @@ public class QLSVView extends JFrame {
 	 */
 	public void thucHienTimKiem() {
 		//Gọi hàm huỷ tìm kiếm
-		this.thucHienHuyTim();
+		this.thucHienTaiLaiDuLieu();
 		
 		// Thực hiện tìm kiếm
 		int queQuan = this.comboBox_queQuan_timKiem.getSelectedIndex()-1;
@@ -521,7 +535,7 @@ public class QLSVView extends JFrame {
 	/**
 	 * Huỷ tìm kiếm và tạo mới toàn bộ dữ liệu trong bảng.
 	 */
-	public void thucHienHuyTim() {
+	public void thucHienTaiLaiDuLieu() {
 		while(true) {
 			DefaultTableModel model_table = (DefaultTableModel) table.getModel();
 			int soLuongDong = model_table.getRowCount();
@@ -538,5 +552,92 @@ public class QLSVView extends JFrame {
 		for(ThiSinh ts :this.model.getDsThiSinh()) {
 			this.themThiSinhVaoTaBle(ts);
 		}
+	}
+
+	public void hienThiAbout() {
+		JOptionPane.showMessageDialog(this, "Phần mềm quản lý thí sinh 1.0!");
+	}
+
+	public void thoatChuongTrinh() {
+		int luaChon = JOptionPane.showConfirmDialog(
+				this,
+				"Bạn có muốn thoát khỏi chương trình?",
+				"Exit",
+				JOptionPane.YES_NO_OPTION);
+		if (luaChon == JOptionPane.YES_OPTION) {
+			System.exit(0);
+		}
+	}
+
+	public void thucHienSaveFile() {
+		if (this.model.getTenFile().length() > 0) {
+			saveFile(this.model.getTenFile());
+		} else {
+			JFileChooser fc = new JFileChooser();
+			int returnVal = fc.showSaveDialog(this);
+
+	        if (returnVal == JFileChooser.APPROVE_OPTION) {
+	            File file = fc.getSelectedFile();
+	            saveFile(file.getAbsolutePath());
+	        } 
+		}
+		
+	}
+
+	private void saveFile(String path) {
+		try {
+			this.model.setTenFile(path);
+			FileOutputStream foStream = new FileOutputStream(path);
+			ObjectOutputStream ooStream = new ObjectOutputStream(foStream);
+			
+			for (ThiSinh ts : this.model.getDsThiSinh()) {
+				ooStream.writeObject(ts);
+			}
+			ooStream.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+
+	public void thucHienOpenFile() {
+		JFileChooser fc = new JFileChooser();
+		int returnVal = fc.showOpenDialog(this);
+		try {
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File file = fc.getSelectedFile();
+			openFile(file);
+			} 
+		}catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+            thucHienTaiLaiDuLieu();
+        } 
+
+	private void openFile(File file){
+		ArrayList<ThiSinh> ds = new ArrayList<ThiSinh>();
+		try {
+			this.model.setTenFile(file.getAbsolutePath());
+			FileInputStream fiStream = new FileInputStream(file);
+			ObjectInputStream oiStream = new ObjectInputStream(fiStream);
+			
+			ThiSinh ts = null;
+			while ((ts = (ThiSinh) oiStream.readObject()) != null) {
+				ds.add(ts);
+			}
+			oiStream.close();
+		}
+			catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		this.model.setDsThiSinh(ds);
 	}
 }
