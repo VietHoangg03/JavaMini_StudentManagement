@@ -34,3 +34,6 @@ Dự án sử dụng các kiến thức Java sau:
 1. Clone repository từ GitHub:
    ```bash
    git clone https://github.com/username/JavaMini_StudentManagement.git
+
+## Liên hệ
+- ** gmail: viethoang03.work@gmail.com
