@@ -36,4 +36,4 @@ Dự án sử dụng các kiến thức Java sau:
    git clone https://github.com/username/JavaMini_StudentManagement.git
 
 ## Liên hệ
-- **Gmail: viethoang03.work@gmail.com
+- **Gmail:** viethoang03.work@gmail.com
