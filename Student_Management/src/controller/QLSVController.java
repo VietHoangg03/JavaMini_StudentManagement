@@ -27,6 +27,7 @@ public class QLSVController implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+
 		String acctionCommand = e.getActionCommand();
 		//JOptionPane.showMessageDialog(view, "Bạn vừa nhấn vào: "+ acctionCommand);
 		

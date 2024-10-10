@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.Objects;
 
 public class ThiSinh implements Serializable {
-	private int maThiSinh;
+	private String maThiSinh;
 	private String tenThiSinh;
 	private Tinh queQuan;
 	private Date ngaySinh;
@@ -29,7 +29,7 @@ public class ThiSinh implements Serializable {
 	 * @param diemMon2
 	 * @param diemMon3
 	 */
-	public ThiSinh(int maThiSinh, String tenThiSinh, Tinh queQuan, Date ngaySinh, boolean gioiTinh,
+	public ThiSinh(String maThiSinh, String tenThiSinh, Tinh queQuan, Date ngaySinh, boolean gioiTinh,
 			float diemMon1, float diemMon2, float diemMon3) {
 		this.maThiSinh = maThiSinh;
 		this.tenThiSinh = tenThiSinh;
@@ -43,11 +43,11 @@ public class ThiSinh implements Serializable {
 	
 	
 	
-	public int getMaThiSinh() {
+	public String getMaThiSinh() {
 		return maThiSinh;
 	}
 
-	public void setMaThiSinh(int maThiSinh) {
+	public void setMaThiSinh(String maThiSinh) {
 		this.maThiSinh = maThiSinh;
 	}
 

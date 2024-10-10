@@ -34,13 +34,18 @@ import javax.swing.JTable;
 import javax.swing.JScrollPane;
 import javax.swing.JRadioButton;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
@@ -319,6 +324,28 @@ public class QLSVView extends JFrame {
 	}
 	
 	/**
+	 * Format ngày sinh.
+	 */
+	public String formatNgaySinh(ThiSinh ts) {
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		String formatNgaySinh = simpleDateFormat.format(ts.getNgaySinh());
+		
+		return formatNgaySinh;
+	}
+	
+	/**
+	 * Format giới tính
+	 */
+	public String formatGioiTinh(ThiSinh ts) {
+		if (ts.isGioiTinh()) {
+			return "Nam";
+		} else {
+			return "Nữ";
+		}
+	}
+	
+	
+	/**
 	 * Reset form điền thông tin.
 	 */
 	public void xoaForm() {
@@ -343,10 +370,12 @@ public class QLSVView extends JFrame {
 		//Format ngày về dạng dd/MM/yyyy
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		String formatNgaySinh = simpleDateFormat.format(ts.getNgaySinh());
+		// Kiểm tra queQuan không bị null
+	 	String tenTinh = (ts.getQueQuan() != null) ? ts.getQueQuan().getTenTinh() : "N/A";
 		
 		DefaultTableModel model_table = (DefaultTableModel) table.getModel();
 		model_table.addRow(new Object[] {
-				ts.getMaThiSinh()+"", ts.getTenThiSinh(), ts.getQueQuan().getTenTinh(),
+				ts.getMaThiSinh()+"", ts.getTenThiSinh(), tenTinh,
 				formatNgaySinh, (ts.isGioiTinh()?"Nam":"Nữ"),
 				ts.getDiemMon1()+"", ts.getDiemMon2()+"", ts.getDiemMon3()+""
 		});
@@ -396,7 +425,7 @@ public class QLSVView extends JFrame {
 		int i_row = table.getSelectedRow();
 		
 		//Get thông tin
-		int maThiSinh = Integer.valueOf(model_table.getValueAt(i_row, 0)+"");
+		String maThiSinh = model_table.getValueAt(i_row, 0)+"";
 		String tenThiSinh = model_table.getValueAt(i_row, 1)+"";
 		Tinh tinh = Tinh.getTinhByTen(model_table.getValueAt(i_row, 2)+"");
 		Date ngaySinh = new Date(model_table.getValueAt(i_row, 3)+"");
@@ -419,7 +448,12 @@ public class QLSVView extends JFrame {
 		this.textField_ID.setText(ts.getMaThiSinh()+"");
 		this.textField_HoVaTen.setText(ts.getTenThiSinh()+"");
 		this.comboBox_queQuan.setSelectedItem(ts.getQueQuan().getTenTinh());
-		this.textField_NgaySinh.setText(ts.getNgaySinh()+"");
+		
+		//Format ngày sinh
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		String formatNgaySinh = simpleDateFormat.format(ts.getNgaySinh());
+		
+		this.textField_NgaySinh.setText(formatNgaySinh+"");
 		if (ts.isGioiTinh()) {
 			radioButton_Nam.setSelected(true);
 		} else {
@@ -451,7 +485,7 @@ public class QLSVView extends JFrame {
 	 */
 	public void thucHienThemThiSinh() {
 		//Get dữ liệu
-		int maThiSinh = Integer.valueOf(this.textField_ID.getText());
+		String maThiSinh = this.textField_ID.getText()+"";
 		String tenThiSinh = this.textField_HoVaTen.getText();
 		int queQuan = this.comboBox_queQuan.getSelectedIndex()-1;
 		Tinh tinh = Tinh.getTinhById(queQuan);
@@ -489,16 +523,17 @@ public class QLSVView extends JFrame {
 		DefaultTableModel model_table = (DefaultTableModel) table.getModel();
 		int soLuongDong = model_table.getRowCount();
 		
-		Set<Integer> idCuaThiSinhCanXoa = new TreeSet<Integer>();
+		Set<String> idCuaThiSinhCanXoa = new TreeSet<String>();
 		
 		// Tìm kiếm bằng quê quán.
 		if(queQuan >= 0) {
 			Tinh tinhDaChon = Tinh.getTinhById(queQuan);
+			
 			for (int i = 0; i < soLuongDong; i++) {
 				String tenTinh = model_table.getValueAt(i, 2) + "";
 				String id = model_table.getValueAt(i, 0) +"";
 				if (!tenTinh.equals(tinhDaChon.getTenTinh())) {
-					idCuaThiSinhCanXoa.add(Integer.valueOf(id));
+					idCuaThiSinhCanXoa.add(id);
 				}
 			}
 		}
@@ -508,13 +543,13 @@ public class QLSVView extends JFrame {
 			for (int i = 0; i < soLuongDong; i++) {
 				String id = model_table.getValueAt(i, 0) + "";
 				if (!id.equals(maThiSinhTimKiem)) {
-					idCuaThiSinhCanXoa.add(Integer.valueOf(id));
+					idCuaThiSinhCanXoa.add(id);
 				}
 			}
 		}
 		
 		// Xoá sinh viên thừa ra khỏi bảng.
-		for (Integer idCanXoa : idCuaThiSinhCanXoa) {
+		for (String idCanXoa : idCuaThiSinhCanXoa) {
 			soLuongDong = model_table.getRowCount();
 			for (int i = soLuongDong - 1; i >= 0; i--) {
 				String idTrongTable = model_table.getValueAt(i, 0) + "";
@@ -553,11 +588,17 @@ public class QLSVView extends JFrame {
 			this.themThiSinhVaoTaBle(ts);
 		}
 	}
-
+	
+	/**
+	 * MenuBar About.
+	 */
 	public void hienThiAbout() {
 		JOptionPane.showMessageDialog(this, "Phần mềm quản lý thí sinh 1.0!");
 	}
-
+	
+	/**
+	 * MenuBar Exit.
+	 */
 	public void thoatChuongTrinh() {
 		int luaChon = JOptionPane.showConfirmDialog(
 				this,
@@ -568,7 +609,10 @@ public class QLSVView extends JFrame {
 			System.exit(0);
 		}
 	}
-
+	
+	/**
+	 * MenuBar save: thực hiện tạo file và tên.
+	 */
 	public void thucHienSaveFile() {
 		if (this.model.getTenFile().length() > 0) {
 			saveFile(this.model.getTenFile());
@@ -583,17 +627,30 @@ public class QLSVView extends JFrame {
 		}
 		
 	}
-
+	
+	/**
+	 * Thực hiện lưu file.
+	 * @param path
+	 */
 	private void saveFile(String path) {
 		try {
 			this.model.setTenFile(path);
-			FileOutputStream foStream = new FileOutputStream(path);
-			ObjectOutputStream ooStream = new ObjectOutputStream(foStream);
+			OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path), "UTF-8");
+			BufferedWriter writer = new BufferedWriter(osw);
 			
 			for (ThiSinh ts : this.model.getDsThiSinh()) {
-				ooStream.writeObject(ts);
+				String data = ts.getMaThiSinh() + ";" + 
+                        	ts.getTenThiSinh() + ";" + 
+                        	ts.getQueQuan().getTenTinh() + ";" + 
+                        	formatNgaySinh(ts) + ";" + 
+                        	formatGioiTinh(ts) + ";" + 
+                        	ts.getDiemMon1() + ";" + 
+                        	ts.getDiemMon2() + ";" + 
+                        	ts.getDiemMon3();
+			writer.write(data);
+			writer.newLine(); // Xuống dòng cho mỗi thí sinh
 			}
-			ooStream.close();
+			writer.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -606,7 +663,10 @@ public class QLSVView extends JFrame {
 		}
 		
 	}
-
+	
+	/**
+	 * Thực hiện mở file.
+	 */
 	public void thucHienOpenFile() {
 		JFileChooser fc = new JFileChooser();
 		int returnVal = fc.showOpenDialog(this);
@@ -624,16 +684,31 @@ public class QLSVView extends JFrame {
 
 	private void openFile(File file){
 		ArrayList<ThiSinh> ds = new ArrayList<ThiSinh>();
+		
 		try {
 			this.model.setTenFile(file.getAbsolutePath());
-			FileInputStream fiStream = new FileInputStream(file);
-			ObjectInputStream oiStream = new ObjectInputStream(fiStream);
+			BufferedReader reader = new BufferedReader(new FileReader(file));
 			
-			ThiSinh ts = null;
-			while ((ts = (ThiSinh) oiStream.readObject()) != null) {
-				ds.add(ts);
+			String line;
+			
+			while ((line = reader.readLine()) != null) {
+				// Tách các thông tin của thí sinh bằng dấu ;
+				String [] data = line.split(";");
+				
+				// Get dữ liệu
+				String maThiSinh = data[0];
+				String tenThiSinh = data[1];
+				String tenTinh = data [2];
+	            Tinh queQuan = Tinh.getTinhByTen(tenTinh);  
+	            Date ngaySinh = new SimpleDateFormat("dd/MM/yyyy").parse(data[3]);
+	            boolean gioiTinh = data[4].equalsIgnoreCase("Nam");
+	            float diemMon1 = Float.parseFloat(data[5]);
+	            float diemMon2 = Float.parseFloat(data[6]);
+	            float diemMon3 = Float.parseFloat(data[7]);
+				
+	            ThiSinh ts = new ThiSinh(maThiSinh, tenThiSinh, queQuan, ngaySinh, gioiTinh, diemMon1, diemMon2, diemMon3);
+	            ds.add(ts);
 			}
-			oiStream.close();
 		}
 			catch (Exception e) {
 			System.out.println(e.getMessage());
