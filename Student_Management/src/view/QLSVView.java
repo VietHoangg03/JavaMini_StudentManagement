@@ -209,6 +209,7 @@ public class QLSVView extends JFrame {
 		contentPane.add(lblNgaySinh);
 		
 		textField_NgaySinh = new JTextField();
+		textField_NgaySinh.setText("dd/MM/yyyy");
 		textField_NgaySinh.setColumns(10);
 		textField_NgaySinh.setBounds(132, 504, 198, 39);
 		contentPane.add(textField_NgaySinh);
@@ -302,7 +303,10 @@ public class QLSVView extends JFrame {
 		contentPane.add(btnHuyBo);
 		
 	}
-
+	
+	/**
+	 * Reset form điền thông tin.
+	 */
 	public void xoaForm() {
 		textField_ID.setText("");
 		textField_HoVaTen.setText("");
@@ -315,9 +319,17 @@ public class QLSVView extends JFrame {
 		buttonGroup_GioiTinh.clearSelection();
 	}
 	
+	
+	/**
+	 * Hiển thị thí sinh lên bảng.
+	 * @param ts
+	 */
 	public void themThiSinhVaoTaBle(ThiSinh ts) {
+		
+		//Format ngày về dạng dd/MM/yyyy
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		String formatNgaySinh = simpleDateFormat.format(ts.getNgaySinh());
+		
 		DefaultTableModel model_table = (DefaultTableModel) table.getModel();
 		model_table.addRow(new Object[] {
 				ts.getMaThiSinh()+"", ts.getTenThiSinh(), ts.getQueQuan().getTenTinh(),
@@ -325,9 +337,13 @@ public class QLSVView extends JFrame {
 				ts.getDiemMon1()+"", ts.getDiemMon2()+"", ts.getDiemMon3()+""
 		});
 	}
-
+	
+	
+	/**
+	 * Kiểm tra để thêm hoặc cập nhật.
+	 * @param ts
+	 */
 	public void themHoacCapNhatSinhVien(ThiSinh ts) {
-		
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		String formatNgaySinh = simpleDateFormat.format(ts.getNgaySinh());
 		DefaultTableModel model_table = (DefaultTableModel) table.getModel();
@@ -339,6 +355,7 @@ public class QLSVView extends JFrame {
 			this.model.update(ts);
 			int soLuongDong = model_table.getRowCount();
 			
+			//Kiểm tra trùng lặp để cập nhật
 			for (int i = 0; i<soLuongDong; i++) {
 				String id = model_table.getValueAt(i, 0)+"";
 				if(id.equals(ts.getMaThiSinh()+"")) {
@@ -355,10 +372,16 @@ public class QLSVView extends JFrame {
 		}
 	}
 	
+	
+	/**
+	 * Lấy thông tin thí sinh từ table.
+	 * @return
+	 */
 	public ThiSinh getThiSinhDangChon() {
 		DefaultTableModel model_table = (DefaultTableModel) table.getModel();
 		int i_row = table.getSelectedRow();
 		
+		//Get thông tin
 		int maThiSinh = Integer.valueOf(model_table.getValueAt(i_row, 0)+"");
 		String tenThiSinh = model_table.getValueAt(i_row, 1)+"";
 		Tinh tinh = Tinh.getTinhByTen(model_table.getValueAt(i_row, 2)+"");
@@ -369,10 +392,14 @@ public class QLSVView extends JFrame {
 		float diemMon2 = Float.valueOf(model_table.getValueAt(i_row, 6)+"");
 		float diemMon3 = Float.valueOf(model_table.getValueAt(i_row, 7)+"");
 		
+		//Create đối tượng mới.
 		ThiSinh ts = new ThiSinh(maThiSinh,tenThiSinh,tinh,ngaySinh,gioiTinh,diemMon1,diemMon2,diemMon3);
 		return ts;
 	}
 	
+	/**
+	 * Hiển thị thông tin thí sinh đang chọn xuống các textField.
+	 */
 	public void hienThiThongTinThiSinhDaChon() {
 		ThiSinh ts = getThiSinhDangChon();
 		this.textField_ID.setText(ts.getMaThiSinh()+"");
@@ -388,7 +415,10 @@ public class QLSVView extends JFrame {
 		this.textField_Mon2.setText(ts.getDiemMon2()+"");
 		this.textField_Mon3.setText(ts.getDiemMon3()+"");
 	}
-
+	
+	/**
+	 * Xoá thí sinh.
+	 */
 	public void thucHienXoa() {
 		DefaultTableModel model_table = (DefaultTableModel) table.getModel();
 		int i_row = table.getSelectedRow();
@@ -401,7 +431,10 @@ public class QLSVView extends JFrame {
 			model_table.removeRow(i_row);
 		}
 	}
-
+	
+	/**
+	 * Thêm thí sinh vào dữ liệu và table.
+	 */
 	public void thucHienThemThiSinh() {
 		//Get dữ liệu
 		int maThiSinh = Integer.valueOf(this.textField_ID.getText());
@@ -428,7 +461,10 @@ public class QLSVView extends JFrame {
 		this.themHoacCapNhatSinhVien(ts);
 		
 	}
-
+	
+	/**
+	 * Tìm kiếm thí sinh theo quê quán và bằng MSV.
+	 */
 	public void thucHienTimKiem() {
 		//Gọi hàm huỷ tìm kiếm
 		this.thucHienHuyTim();
@@ -441,6 +477,7 @@ public class QLSVView extends JFrame {
 		
 		Set<Integer> idCuaThiSinhCanXoa = new TreeSet<Integer>();
 		
+		// Tìm kiếm bằng quê quán.
 		if(queQuan >= 0) {
 			Tinh tinhDaChon = Tinh.getTinhById(queQuan);
 			for (int i = 0; i < soLuongDong; i++) {
@@ -452,6 +489,7 @@ public class QLSVView extends JFrame {
 			}
 		}
 		
+		// Tìm kiếm bằng msv.
 		if (maThiSinhTimKiem.length() > 0) {
 			for (int i = 0; i < soLuongDong; i++) {
 				String id = model_table.getValueAt(i, 0) + "";
@@ -461,6 +499,7 @@ public class QLSVView extends JFrame {
 			}
 		}
 		
+		// Xoá sinh viên thừa ra khỏi bảng.
 		for (Integer idCanXoa : idCuaThiSinhCanXoa) {
 			soLuongDong = model_table.getRowCount();
 			for (int i = soLuongDong - 1; i >= 0; i--) {
@@ -479,7 +518,9 @@ public class QLSVView extends JFrame {
 	}
 	
 
-	
+	/**
+	 * Huỷ tìm kiếm và tạo mới toàn bộ dữ liệu trong bảng.
+	 */
 	public void thucHienHuyTim() {
 		while(true) {
 			DefaultTableModel model_table = (DefaultTableModel) table.getModel();
