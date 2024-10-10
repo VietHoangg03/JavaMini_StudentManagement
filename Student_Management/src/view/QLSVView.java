@@ -242,11 +242,11 @@ public class QLSVView extends JFrame {
 		
 		// Chọn giới tính
 		radioButton_Nam = new JRadioButton("Nam");
-		radioButton_Nam.setBounds(503, 366, 141, 23);
+		radioButton_Nam.setBounds(503, 366, 65, 23);
 		contentPane.add(radioButton_Nam);
 		
 		radioButton_Nu = new JRadioButton("Nữ");
-		radioButton_Nu.setBounds(610, 366, 141, 23);
+		radioButton_Nu.setBounds(610, 366, 65, 23);
 		contentPane.add(radioButton_Nu);
 		
 		// Chỉ chọn được một giới tính
@@ -376,7 +376,7 @@ public class QLSVView extends JFrame {
 		DefaultTableModel model_table = (DefaultTableModel) table.getModel();
 		model_table.addRow(new Object[] {
 				ts.getMaThiSinh()+"", ts.getTenThiSinh(), tenTinh,
-				formatNgaySinh, (ts.isGioiTinh()?"Nam":"Nữ"),
+				formatNgaySinh, formatGioiTinh(ts),
 				ts.getDiemMon1()+"", ts.getDiemMon2()+"", ts.getDiemMon3()+""
 		});
 	}
@@ -394,24 +394,32 @@ public class QLSVView extends JFrame {
 		if(!this.model.kiemTraTonTai(ts)) {
 			this.model.insert(ts);
 			this.themThiSinhVaoTaBle(ts);
+			JOptionPane.showMessageDialog(this, "Đã thêm thí sinh thành công!");
 		} else {
-			this.model.update(ts);
-			int soLuongDong = model_table.getRowCount();
+			int option = JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn thay đổi dữ liệu thí sinh có mã: "+ts.getMaThiSinh());
 			
-			//Kiểm tra trùng lặp để cập nhật
-			for (int i = 0; i<soLuongDong; i++) {
-				String id = model_table.getValueAt(i, 0)+"";
-				if(id.equals(ts.getMaThiSinh()+"")) {
-					model_table.setValueAt(ts.getMaThiSinh()+"", i, 0);
-					model_table.setValueAt(ts.getTenThiSinh()+"", i, 1);
-					model_table.setValueAt(ts.getQueQuan().getTenTinh()+"", i, 2);
-					model_table.setValueAt(formatNgaySinh+"", i, 3);
-					model_table.setValueAt(ts.isGioiTinh()?"Nam":"Nữ", i, 4);
-					model_table.setValueAt(ts.getDiemMon1()+"", i, 5);
-					model_table.setValueAt(ts.getDiemMon2()+"", i, 6);
-					model_table.setValueAt(ts.getDiemMon3()+"", i, 7);
+			if (option == JOptionPane.YES_OPTION) {
+				this.model.update(ts);
+				int soLuongDong = model_table.getRowCount();
+				
+				//Kiểm tra trùng lặp để cập nhật
+				for (int i = 0; i<soLuongDong; i++) {
+					String id = model_table.getValueAt(i, 0)+"";
+					if(id.equals(ts.getMaThiSinh().toString().trim())) {
+
+						model_table.setValueAt(ts.getMaThiSinh()+"", i, 0);
+						model_table.setValueAt(ts.getTenThiSinh()+"", i, 1);
+						model_table.setValueAt(ts.getQueQuan().getTenTinh()+"", i, 2);
+						model_table.setValueAt(formatNgaySinh+"", i, 3);
+						model_table.setValueAt(ts.isGioiTinh()?"Nam":"Nữ", i, 4);
+						model_table.setValueAt(ts.getDiemMon1()+"", i, 5);
+						model_table.setValueAt(ts.getDiemMon2()+"", i, 6);
+						model_table.setValueAt(ts.getDiemMon3()+"", i, 7);
+					}
 				}
+				thucHienTaiLaiDuLieu();
 			}
+			JOptionPane.showMessageDialog(this, "Thí sinh " +ts.getMaThiSinh()+" đã được cập nhật dữ liệu!");
 		}
 	}
 	
@@ -484,16 +492,37 @@ public class QLSVView extends JFrame {
 	 * Thêm thí sinh vào dữ liệu và table.
 	 */
 	public void thucHienThemThiSinh() {
+		try {
+		
+		// Kiểm tra thông tin đầu vào
+		boolean thongBao;
+		if (this.textField_ID.getText().trim().isEmpty() ||this.textField_HoVaTen.getText().trim().isEmpty()
+				||this.comboBox_queQuan.getSelectedIndex() <= 0 ||
+				this.textField_NgaySinh.getText().trim().isEmpty() ||
+				this.textField_NgaySinh.getText().trim().equals("dd/MM/yyyy") ||
+				this.buttonGroup_GioiTinh.getSelection() == null||
+				textField_Mon1.getText().trim().isEmpty()||
+				textField_Mon2.getText().trim().isEmpty()||
+				textField_Mon2.getText().trim().isEmpty()) {
+			thongBao = true;
+		} else {
+			thongBao = false;
+		}
+		if(thongBao == true) {
+			JOptionPane.showMessageDialog(this, "Bạn hãy điền đầy đủ thông tin thí sinh!");
+		}
+		
+		
 		//Get dữ liệu
 		String maThiSinh = this.textField_ID.getText()+"";
 		String tenThiSinh = this.textField_HoVaTen.getText();
-		int queQuan = this.comboBox_queQuan.getSelectedIndex()-1;
+		int queQuan = this.comboBox_queQuan.getSelectedIndex();
 		Tinh tinh = Tinh.getTinhById(queQuan);
 		Date ngaySinh = new Date(this.textField_NgaySinh.getText());
 
 		Boolean gioiTinh = true;
 		String chonGioiTinh = this.buttonGroup_GioiTinh.getSelection()+"";
-		if(chonGioiTinh.equals("Nam")) {
+		if(chonGioiTinh.trim().equals("Nam")) {
 			gioiTinh = true;
 		} else {
 			gioiTinh = false;
@@ -503,11 +532,13 @@ public class QLSVView extends JFrame {
 		float diemMon2 = Float.valueOf(this.textField_Mon2.getText());
 		float diemMon3 = Float.valueOf(this.textField_Mon3.getText());
 		
+		
 		//Create new Thí Sinh
 		ThiSinh ts = new ThiSinh(maThiSinh,tenThiSinh,tinh,ngaySinh,gioiTinh,diemMon1,diemMon2,diemMon3);
 		
 		this.themHoacCapNhatSinhVien(ts);
-		
+		} catch (Exception e) {
+		}
 	}
 	
 	/**
@@ -518,7 +549,7 @@ public class QLSVView extends JFrame {
 		this.thucHienTaiLaiDuLieu();
 		
 		// Thực hiện tìm kiếm
-		int queQuan = this.comboBox_queQuan_timKiem.getSelectedIndex()-1;
+		int queQuan = this.comboBox_queQuan_timKiem.getSelectedIndex();
 		String maThiSinhTimKiem = this.textField_MaThiSinh_TimKiem.getText();
 		DefaultTableModel model_table = (DefaultTableModel) table.getModel();
 		int soLuongDong = model_table.getRowCount();
@@ -526,7 +557,7 @@ public class QLSVView extends JFrame {
 		Set<String> idCuaThiSinhCanXoa = new TreeSet<String>();
 		
 		// Tìm kiếm bằng quê quán.
-		if(queQuan >= 0) {
+		if(queQuan > 0) {
 			Tinh tinhDaChon = Tinh.getTinhById(queQuan);
 			
 			for (int i = 0; i < soLuongDong; i++) {
@@ -535,6 +566,13 @@ public class QLSVView extends JFrame {
 				if (!tenTinh.equals(tinhDaChon.getTenTinh())) {
 					idCuaThiSinhCanXoa.add(id);
 				}
+			}
+			
+			int soLuongThiSinhTimThay = soLuongDong - idCuaThiSinhCanXoa.size();
+			if (soLuongThiSinhTimThay > 0) {
+				JOptionPane.showMessageDialog(this, "Đã tìm thấy "+soLuongThiSinhTimThay+" thí sinh có quê là "+tinhDaChon.getTenTinh());
+			} else {
+				JOptionPane.showMessageDialog(this, "Không tìm thấy thí sinh có quê là "+tinhDaChon.getTenTinh());
 			}
 		}
 		
@@ -545,6 +583,13 @@ public class QLSVView extends JFrame {
 				if (!id.equals(maThiSinhTimKiem)) {
 					idCuaThiSinhCanXoa.add(id);
 				}
+			}
+			
+			int soLuongThiSinhTimThay = soLuongDong - idCuaThiSinhCanXoa.size();
+			if (soLuongThiSinhTimThay  == 1) {
+				JOptionPane.showMessageDialog(this, "Đã tìm thấy thí sinh có mã là: "+maThiSinhTimKiem);
+			} else {
+				JOptionPane.showMessageDialog(this, "Không tìm thấy thí sinh có mã là: " +maThiSinhTimKiem);
 			}
 		}
 		
@@ -614,18 +659,21 @@ public class QLSVView extends JFrame {
 	 * MenuBar save: thực hiện tạo file và tên.
 	 */
 	public void thucHienSaveFile() {
-		if (this.model.getTenFile().length() > 0) {
-			saveFile(this.model.getTenFile());
-		} else {
-			JFileChooser fc = new JFileChooser();
-			int returnVal = fc.showSaveDialog(this);
+		 int a=JOptionPane.showConfirmDialog(this,"Nhấn 'Yes' để xác nhận lưu dữ liệu ");  
+		 if(a==JOptionPane.YES_OPTION) {
+			 	if (this.model.getTenFile().length() > 0) {
+			 		saveFile(this.model.getTenFile());
+			 	} else {
+				JFileChooser fc = new JFileChooser();	
+					int returnVal = fc.showSaveDialog(this);
 
-	        if (returnVal == JFileChooser.APPROVE_OPTION) {
-	            File file = fc.getSelectedFile();
-	            saveFile(file.getAbsolutePath());
-	        } 
-		}
-		
+					if (returnVal == JFileChooser.APPROVE_OPTION) {
+						File file = fc.getSelectedFile();
+						saveFile(file.getAbsolutePath());
+					} 
+			 	}
+			 	JOptionPane.showMessageDialog(this, "Đã lưu dữ liệu thành công!");
+		 }
 	}
 	
 	/**
@@ -639,9 +687,11 @@ public class QLSVView extends JFrame {
 			BufferedWriter writer = new BufferedWriter(osw);
 			
 			for (ThiSinh ts : this.model.getDsThiSinh()) {
+				String tenTinh = (ts.getQueQuan() != null) ? ts.getQueQuan().getTenTinh() : "Không rõ";
+				
 				String data = ts.getMaThiSinh() + ";" + 
                         	ts.getTenThiSinh() + ";" + 
-                        	ts.getQueQuan().getTenTinh() + ";" + 
+                        	tenTinh + ";" + 
                         	formatNgaySinh(ts) + ";" + 
                         	formatGioiTinh(ts) + ";" + 
                         	ts.getDiemMon1() + ";" + 
@@ -674,10 +724,17 @@ public class QLSVView extends JFrame {
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = fc.getSelectedFile();
 			openFile(file);
+			
+			if (this.model.getDsThiSinh().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "File không có dữ liệu!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "Mở file thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+            }
 			} 
 		}catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				JOptionPane.showMessageDialog(this, "Lỗi khi mở file!", "Lỗi", JOptionPane.ERROR_MESSAGE);
 			}
             thucHienTaiLaiDuLieu();
         } 
@@ -693,13 +750,15 @@ public class QLSVView extends JFrame {
 			
 			while ((line = reader.readLine()) != null) {
 				// Tách các thông tin của thí sinh bằng dấu ;
-				String [] data = line.split(";");
+				String[] data = line.split(";");
 				
 				// Get dữ liệu
 				String maThiSinh = data[0];
 				String tenThiSinh = data[1];
 				String tenTinh = data [2];
+				
 	            Tinh queQuan = Tinh.getTinhByTen(tenTinh);  
+	            
 	            Date ngaySinh = new SimpleDateFormat("dd/MM/yyyy").parse(data[3]);
 	            boolean gioiTinh = data[4].equalsIgnoreCase("Nam");
 	            float diemMon1 = Float.parseFloat(data[5]);
@@ -714,5 +773,6 @@ public class QLSVView extends JFrame {
 			System.out.println(e.getMessage());
 		}
 		this.model.setDsThiSinh(ds);
+		
 	}
 }
